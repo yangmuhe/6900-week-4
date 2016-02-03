@@ -1,0 +1,16 @@
+.plot{
+}
+
+.guide{
+    fill:none;
+    stroke:rgb(100,100,100);
+}
+
+.area{
+    fill:rgba(200,200,200,.1);
+}
+.line{
+    fill:none;
+    stroke:rgb(80,80,80);
+    stroke-width:1px;
+}
