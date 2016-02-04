@@ -1,6 +1,15 @@
 var w = d3.select('.plot').node().clientWidth,
     h = d3.select('.plot').node().clientHeight;
 
+var timeSeries = d3.timeSeries()
+    .width(w)
+    .height(h)
+    .timeRange([new Date(2011,6,16),new Date(2013,11,15)])
+    .value(function(d){ return d.startTime; })
+    .maxY(80)
+    .binSize(d3.time.day);
+
+
 d3.csv('../data/hubway_trips_reduced.csv',parse,dataLoaded);
 
 function dataLoaded(err,rows){
@@ -10,8 +19,6 @@ function dataLoaded(err,rows){
     var tripsByStation = d3.nest()
         .key(function(d){return d.startStation})
         .entries(rows);
-
-    console.log(tripsByStation)
 
     //create a <div> for each station
     //bind trips data to each station
@@ -24,18 +31,11 @@ function dataLoaded(err,rows){
 
     plots
         .each(function(d){
-            //@param d?
-            //this?
-            var timeSeries = d3.timeSeries()
-                .width(w)
-                .height(h)
-                .timeRange([new Date(2012,6,15),new Date(2013,6,15)])
-                .value(function(d){ return d.startTime; })
-                .maxY(50)
-                .bins(d3.range(new Date(2011,6,15), new Date(2013,6,16), 1000*3600*24));
-
             d3.select(this).datum(d.values)
-                .call(timeSeries);
+                .call(timeSeries)
+                .append('h2')
+                .text(d.key);
+
         })
 }
 

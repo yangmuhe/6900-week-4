@@ -7,13 +7,21 @@ d3.timeSeries = function(){
 		chartW = w - m.l - m.r,
 		chartH = h - m.t - m.b,
 		timeRange = [new Date(), new Date()], //default timeRange
+        binSize = d3.time.day,
 		maxY = 1000, //maximum number of trips to show on the y axis
-		scaleX = d3.scale.linear().range([0,chartW]).domain(timeRange),
+		scaleX = d3.time.scale().range([0,chartW]).domain(timeRange),
 		scaleY = d3.scale.linear().range([chartH,0]).domain([0,maxY]),
 		valueAccessor = function(d){ return d; };
 	
 	function exports(_selection){
 		//recompute internal variables if updated
+        var bins = binSize.range(timeRange[0],timeRange[1]);
+        bins.unshift(timeRange[0]);
+        bins.push(timeRange[1]);
+
+        layout
+            .range(timeRange)
+            .bins(bins);
 
 		chartW = w - m.l - m.r,
 		chartH = h - m.t - m.b;
@@ -27,16 +35,21 @@ d3.timeSeries = function(){
 	function draw(d){
 
 		var _d = layout(d);
+        console.log(_d);
 
 		var line = d3.svg.line()
-			.x(function(d){ return scaleX(d.x + d.dx/2)})
+			.x(function(d){ return scaleX(d.x.getTime() + d.dx/2)})
 			.y(function(d){ return scaleY(d.y)})
 			.interpolate('basis');
 		var area = d3.svg.area()
-			.x(function(d){ return scaleX(d.x + d.dx/2)})
+			.x(function(d){ return scaleX(d.x.getTime() + d.dx/2)})
 			.y0(chartH)
 			.y1(function(d){ return scaleY(d.y)})
 			.interpolate('basis');
+        var axisX = d3.svg.axis()
+            .orient('bottom')
+            .scale(scaleX)
+            .ticks(d3.time.year);
 
 		//append and update DOM
 		//Step 1: does <svg> element exist? If it does, update width and height; if it doesn't, create <svg>
@@ -46,7 +59,7 @@ d3.timeSeries = function(){
 		var svgEnter = svg.enter().append('svg')
 		svgEnter.append('g').attr('class','area').attr('transform','translate('+m.l+','+m.t+')').append('path');
 		svgEnter.append('g').attr('class','line').attr('transform','translate('+m.l+','+m.t+')').append('path');
-		svgEnter.append('g').attr('class','axis').attr('transform','translate('+m.l+','+m.t+')');
+		svgEnter.append('g').attr('class','axis').attr('transform','translate('+m.l+','+(m.t+chartH)+')');
 
 		svg.attr('width',w).attr('height',h);
 
@@ -61,6 +74,9 @@ d3.timeSeries = function(){
 			.select('path')
 			.datum(_d)
 			.attr('d',area);
+        //2.3 horizontal axis
+        svg.select('.axis')
+            .call(axisX);
 	}
 
 	//Getter and setter
@@ -77,12 +93,6 @@ d3.timeSeries = function(){
 	exports.timeRange = function(_r){
 		if(!arguments.length) return timeRange;
 		timeRange = _r;
-		layout.range(_r);
-		return this;
-	}
-	exports.bins = function(_b){
-		if(!arguments.length) return layout.bins();
-		layout.bins(_b);
 		return this;
 	}
 	exports.value = function(_v){
@@ -96,6 +106,12 @@ d3.timeSeries = function(){
 		maxY = _y;
 		return this;
 	}
+    exports.binSize = function(_b){
+        //@param _b: d3.time.interval
+        if(!arguments.length) return binSize;
+        binSize = _b;
+        return this;
+    }
 
 	return exports;
 }
