@@ -2,4 +2,4 @@
 
 - d3.**timeSeries**()
 
-Create a new time series module with default configurations
+  Create a new time series module with default configurations
