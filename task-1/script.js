@@ -1,7 +1,7 @@
 var w = d3.select('.plot').node().clientWidth,
     h = d3.select('.plot').node().clientHeight;
 
-console.log(w, h);
+//console.log(w, h);
 
 d3.csv('../data/hubway_trips_reduced.csv',parse,dataLoaded);
 
@@ -18,7 +18,7 @@ function dataLoaded(err,rows){
         .key(function(d){return d.startStation})
         .entries(rows);
 
-    console.log(tripsByStation);
+    //console.log(tripsByStation);
 
     /*d3.select('.plot')
         .datum(rows)  //why "datum": put the whole array into a single selection
@@ -34,6 +34,7 @@ function dataLoaded(err,rows){
     plots.each(function(d){
         d3.select(this).datum(d.values)  //??
             .call(timeSeries1)
+            .append('h2')  //h2?
             .text(d.key)
     })
 

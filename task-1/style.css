@@ -1,5 +1,5 @@
 .plot{
-    width: 30%;
+    width: 50%;
     height: 200px;
 }
 
@@ -9,7 +9,7 @@
 }
 
 .area{
-    fill:rgba(200,200,200,.1);
+    fill:rgba(200,200,200,.5);
 }
 .line{
     fill:none;

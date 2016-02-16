@@ -8,8 +8,8 @@ d3.timeSeries = function(){
     var w = 800,
         h = 600,
         m = {t:25, r:50, b:25, l:50},
-        chartW = w - m.t - m.b,
-        chartH = h - m.r - m.l,
+        chartW = w - m.l - m.r,
+        chartH = h - m.t - m.b,
         timeRange = [new Date(), new Date()],
         binSize, //if not specified here and neither do user, user will get an error
         maxY = 1000,
@@ -27,6 +27,8 @@ d3.timeSeries = function(){
             .attr('height',h)
             .append('circle').attr('r',50)
         */
+        chartW = w - m.l - m.r;  //!! why do they have to be defined here again?
+        chartH = h - m.t - m.b;
 
         //create the histogram layout
         var layout = d3.layout.histogram()
@@ -48,11 +50,6 @@ d3.timeSeries = function(){
             //scaleX.domain(timeRange);
             //scaleY.domain([0, d3.max(data, function(d){return d.y})]);
 
-            //axis
-            var axisX = d3.svg.axis()
-                .scale(scaleX)
-                .orient('bottom')
-                .ticks(d3.time.year);
 
             //Generator
             var lineGenerator = d3.svg.line()
@@ -65,14 +62,20 @@ d3.timeSeries = function(){
                 .y1(function(d){return scaleY(d.y)})
                 .interpolate('basis');
 
+            //axis
+            var axisX = d3.svg.axis()
+                .scale(scaleX)
+                .orient('bottom')
+                .ticks(d3.time.year);
+
             //append DOM
             //selection.append('svg')
-            var svg = d3.select(this)//.append('svg')
-                .selectAll('svg')
-                .data([_d])
+            var svg = d3.select(this).append('svg');
+                //.selectAll('svg')
+                //.data([_d])
 
+            /*
             var svgEnter = svg.enter().append('svg').attr('width',w).attr('height',h);
-
 
             svgEnter.append('g').attr('class','line')
                 .attr('transform','translate('+m.l+','+m.t+')')
@@ -82,11 +85,22 @@ d3.timeSeries = function(){
                 .append('path')
             svgEnter.append('g').attr('class','axis')
                 .attr('transform','translate('+m.l+','+(m.t+chartH)+')')
+            */
 
-            svg.select('.line')
+            svg.attr('width',w).attr('height',h);
+            svg.append('g').attr('class','line')
+                .attr('transform','translate('+m.l+','+m.t+')')
+                .append('path');
+            svg.append('g').attr('class','area')
+                .attr('transform','translate('+m.l+','+m.t+')')
+                .append('path');
+            svg.append('g').attr('class','axis')
+                .attr('transform','translate('+m.l+','+(m.t+chartH)+')');
+
+            svg.select('.line').select('path')
                 .datum(data)
                 .attr('d',lineGenerator);
-            svg.select('.area')
+            svg.select('.area').select('path')
                 .datum(data)
                 .attr('d',areaGenerator);
             svg.select('.axis')
@@ -112,8 +126,6 @@ d3.timeSeries = function(){
 
 
         })
-
-        //draw the (x,y) as a line, and an area
 
     }
 
